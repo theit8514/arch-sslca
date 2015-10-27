@@ -133,9 +133,9 @@ function easyrsa {
 		init-pki)
 			chown root: $_EASYRSA_PKI
 			chmod u=rwx,go=x $_EASYRSA_PKI
-			mkdir -p $_EASYRSA_PKI/issued
-			chown root: $_EASYRSA_PKI/issued
-			chmod u=rwx,go=x $_EASYRSA_PKI/issued
+			chown root: $_EASYRSA_PKI/*
+			chmod u=rwx,go=x $_EASYRSA_PKI/*
+			chmod u=rwx,go= $_EASYRSA_PKI/private
 			;;
 		build-ca)
 			if [ -f $_EASYRSA_PKI/ca.crt ]; then

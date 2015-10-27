@@ -26,9 +26,11 @@ fi
 	}
 	source /easy-rsa/vars
 	mkdir -p $EASYRSA_PKI
-	chmod +rx $EASYRSA_PKI
-	mkdir -p $EASYRSA_PKI/issued
-	chmod +rx $EASYRSA_PKI/issued
+	chown root: $EASYRSA_PKI
+	chmod u=rwx,go=x $EASYRSA_PKI
+	chown root: $EASYRSA_PKI/* 2>/dev/null
+	chmod u=rwx,go=x $EASYRSA_PKI/* 2>/dev/null
+	[ -d $EASYRSA_PKI/private ] && chmod u=rwx,go= $EASYRSA_PKI/private
 	if [ -f $EASYRSA_PKI/ca.crt ]; then
 		chmod +r $EASYRSA_PKI/ca.crt
 		ln -sf $EASYRSA_PKI/ca.crt /usr/share/nginx/html/ca.crt

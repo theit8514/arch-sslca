@@ -106,18 +106,29 @@ function easyrsa {
 		echo "Initializing pki folder will erase data outside container!"
 	fi
         /easy-rsa/easyrsa "$@"
-        if [ "$1" == "init-pki" ]; then
-                chown root: $EASYRSA_PKI
-                chmod u=rwx,go=x $EASYRSA_PKI
-        fi
-        if [ "$1" == "build-ca" -a -f $EASYRSA_PKI/ca.crt ]; then
-                chmod u=rw,go=r $EASYRSA_PKI/ca.crt
-                ln -sf $EASYRSA_PKI/ca.crt /usr/share/nginx/html/ca.crt
-        fi
-	if [ "$1" == "gen-crl" -a -f $EASYRSA_PKI/crl.pem ]; then
-		chmod u=rw,go=r $EASYRSA_PKI/crl.pem
-		ln -sf $EASYRSA_PKI/crl.pem /usr/share/nginx/html/ca.crl
-	fi
+	while [ $# -ne 0 ]
+	do
+		arg="$1"
+		case "$arg" in
+		init-pki)
+			chown root: $EASYRSA_PKI
+			chmod u=rwx,go=x $EASYRSA_PKI
+			;;
+		build-ca)
+			if [ -f $EASYRSA_PKI/ca.crt ]; then
+				chmod u=rw,go=r $EASYRSA_PKI/ca.crt
+				ln -sf $EASYRSA_PKI/ca.crt /usr/share/nginx/html/ca.crt
+			fi
+			;;
+		gen-crl)
+			if [ -f $EASYRSA_PKI/crl.pem ]; then
+				chmod u=rw,go=r $EASYRSA_PKI/crl.pem
+				ln -sf $EASYRSA_PKI/crl.pem /usr/share/nginx/html/ca.crl
+			fi
+			;;
+		esac
+		shift
+	done
 }
 
 if ! [ -f /config/.sslca_first_run ]; then

@@ -82,6 +82,7 @@ fi
 alias supervisorctl='supervisorctl -c /etc/supervisor.conf'
 alias ll='ls -l'
 
+[ -z "$EASYRSA_VARS_FILE" ] && export EASYRSA_VARS_FILE=/config/easy-rsa/vars
 export EASYRSA_CALLER=start
 function set_var() {
         export OLD_$1=${!1}
@@ -92,38 +93,59 @@ function unset_var() {
         test -z "$old_var_name" && unset $1 || export $1=${!old_var_name}
         unset OLD_$1
 }
-source /easy-rsa/vars
+tvf=$(mktemp)
+grep "EASYRSA_PKI" $EASYRSA_VARS_FILE > $tvf
+sed -i 's/EASYRSA_PKI/_EASYRSA_PKI/' $tvf
+source $tvf
 unset EASYRSA_CALLER
 unset -f set_var
 unset -f unset_var
-if ! [ -f $EASYRSA_PKI/ca.crt ]; then
+rm -f $tvf
+echo $_EASYRSA_PKI
+if ! [ -f $_EASYRSA_PKI/ca.crt ]; then
         echo "No ca certificate found. Execute 'easyrsa build-ca' to build the certificate"
 	echo "To ensure maximum security, use 'easyrsa build-ca --keysize 4096'"
 fi
 
 function easyrsa {
-	if [ "$1" == "init-pki" ]; then
-		echo "Initializing pki folder will erase data outside container!"
-	fi
-        /easy-rsa/easyrsa "$@"
+	args=("$@")
 	while [ $# -ne 0 ]
 	do
 		arg="$1"
 		case "$arg" in
 		init-pki)
-			chown root: $EASYRSA_PKI
-			chmod u=rwx,go=x $EASYRSA_PKI
+			echo "Initializing pki folder will erase data outside container!"
+			;;
+		esac
+		shift
+	done
+	set -- "${args[@]}"
+        /easy-rsa/easyrsa "$@"
+	if [ -d $_EASYRSA_PKI/issued ]; then
+		files=$(ls $_EASYRSA_PKI/issued/*.crt 2> /dev/null | wc -l)
+		[ "$files" != "0" ] && chmod u=rw,go=r $_EASYRSA_PKI/issued/*.crt
+	fi
+	while [ $# -ne 0 ]
+	do
+		arg="$1"
+		case "$arg" in
+		init-pki)
+			chown root: $_EASYRSA_PKI
+			chmod u=rwx,go=x $_EASYRSA_PKI
+			mkdir -p $_EASYRSA_PKI/issued
+			chown root: $_EASYRSA_PKI/issued
+			chmod u=rwx,go=x $_EASYRSA_PKI/issued
 			;;
 		build-ca)
-			if [ -f $EASYRSA_PKI/ca.crt ]; then
-				chmod u=rw,go=r $EASYRSA_PKI/ca.crt
-				ln -sf $EASYRSA_PKI/ca.crt /usr/share/nginx/html/ca.crt
+			if [ -f $_EASYRSA_PKI/ca.crt ]; then
+				chmod u=rw,go=r $_EASYRSA_PKI/ca.crt
+				ln -sf $_EASYRSA_PKI/ca.crt /usr/share/nginx/html/ca.crt
 			fi
 			;;
 		gen-crl)
-			if [ -f $EASYRSA_PKI/crl.pem ]; then
-				chmod u=rw,go=r $EASYRSA_PKI/crl.pem
-				ln -sf $EASYRSA_PKI/crl.pem /usr/share/nginx/html/ca.crl
+			if [ -f $_EASYRSA_PKI/crl.pem ]; then
+				chmod u=rw,go=r $_EASYRSA_PKI/crl.pem
+				ln -sf $_EASYRSA_PKI/crl.pem /usr/share/nginx/html/ca.crl
 			fi
 			;;
 		esac

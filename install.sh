@@ -10,6 +10,7 @@ if ! [ -f /easy-rsa/vars ]; then
 	sed -i -r 's|#*set_var EASYRSA_DN\s+"cn_only"|set_var EASYRSA_DN "org"|' /easy-rsa/vars
 	sed -i -r 's|#*set_var EASYRSA_CA_EXPIRE\s+3650|set_var EASYRSA_CA_EXPIRE 7300|' /easy-rsa/vars
 	sed -i -r 's|#*set_var EASYRSA_CERT_EXPIRE\s+3650|set_var EASYRSA_CERT_EXPIRE 365|' /easy-rsa/vars
+	sed -i -r 's|#*set_var EASYRSA_EXT_DIR\s+"\$EASYRSA/x509-types"|set_var EASYRSA_EXT_DIR "/config/easy-rsa/x509-types"|' /easy-rsa/vars
 fi
 
 # remove unix socket from supervisord

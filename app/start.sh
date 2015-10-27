@@ -4,38 +4,34 @@ echo "[info] Configuring easy-rsa..."
 mkdir -p /config/easy-rsa
 mkdir -p /data/keys
 chmod u=rwx,go=x /data/keys
-if [ -f /config/easy-rsa/vars ]; then
-	cp -f /config/easy-rsa/vars /easy-rsa/vars
-else
+if ! [ -f /config/easy-rsa/vars ]; then
 	cp -f /easy-rsa/vars /config/easy-rsa/vars
-	echo "vars added to /data volume, update with your preferences"
+	echo "edit /config/easy-rsa/vars to set easyrsa settings"
 fi
-if [ -f /config/easy-rsa/x509-common ]; then
-	cp -f /config/easy-rsa/x509-common /easy-rsa/x509-types/COMMON
-else
-	cp -f /easy-rsa/x509-types/COMMON /config/easy-rsa/x509-common
-	echo "x509-common added to /data volume, uncomment and update with your crl url"
+
+if ! [ -d /config/easy-rsa/x509-types ]; then
+	mkdir -p /config/easy-rsa/x509-types/
+	cp /easy-rsa/x509-types/* /config/easy-rsa/x509-types
 fi
-#echo "source /easy-rsa/vars" >> /root/.bashrc
 (
 	export EASYRSA_CALLER=start
-	function set_var() {                                                            
-		export OLD_$1=${!1}                                                         
-		export $1=$2                                                                
-	}                                                                               
-	function unset_var() {                                                          
-		old_var_name="OLD_$1"                                                       
-		test -z "$old_var_name" && unset $1 || export $1=${!old_var_name}           
-		unset OLD_$1                                                                
+	function set_var() {
+		export OLD_$1=${!1}
+		export $1=$2
+	}
+	function unset_var() {
+		old_var_name="OLD_$1"
+		test -z "$old_var_name" && unset $1 || export $1=${!old_var_name}
+		unset OLD_$1
 	}
 	source /easy-rsa/vars
 	mkdir -p $EASYRSA_PKI
 	chmod +rx $EASYRSA_PKI
+	mkdir -p $EASYRSA_PKI/issued
+	chmod +rx $EASYRSA_PKI/issued
 	if [ -f $EASYRSA_PKI/ca.crt ]; then
 		chmod +r $EASYRSA_PKI/ca.crt
 		ln -sf $EASYRSA_PKI/ca.crt /usr/share/nginx/html/ca.crt
-	else
-		echo "No ca certificate found. Execute build-ca to build the certificate"
 	fi
 	if [ -f $EASYRSA_PKI/private/ca.key ]; then
 		chmod u=rw,go= $EASYRSA_PKI/private/ca.key
@@ -45,6 +41,7 @@ fi
 		chmod u=rw,go=r $EASYRSA_PKI/crl.pem
 		ln -sf $EASYRSA_PKI/crl.pem /usr/share/nginx/html/crl.pem
 	fi
+	ln -sf $EASYRSA_PKI/issued /usr/share/nginx/html/
 )
 echo "[info] easy-rsa configuration done"
 

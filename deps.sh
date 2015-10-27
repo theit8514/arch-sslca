@@ -4,7 +4,7 @@
 set -e
 
 # define pacman packages
-pacman_packages="net-tools openresolv unzip unrar wget openssh nginx"
+pacman_packages="net-tools openresolv unzip unrar wget openssh nginx vim nano"
 
 # install pre-reqs
 pacman -Sy --noconfirm

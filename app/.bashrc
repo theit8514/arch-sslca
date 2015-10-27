@@ -81,6 +81,7 @@ fi
 
 alias supervisorctl='supervisorctl -c /etc/supervisor.conf'
 alias ll='ls -l'
+alias vi='vim'
 
 [ -z "$EASYRSA_VARS_FILE" ] && export EASYRSA_VARS_FILE=/config/easy-rsa/vars
 export EASYRSA_CALLER=start

@@ -142,7 +142,8 @@ Once the proper settings are configured, you can begin your PKI environment.
 'easyrsa init-pki' will create the necessary folder structure in your EASYRSA_PKI
   folder (default /data/keys)
 'easyrsa build-ca' will create a certificate authority. A higher key strength
-  is recommended by using the --keysize argument.
+  is recommended by using the --keysize argument. e.g:
+  'easyrsa --keysize=4096 build-ca'
 
 At this point, you an access your ca certificate via the nginx server:
 If the container is hosted on port 8080 (-p 80808:80), then

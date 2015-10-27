@@ -123,6 +123,7 @@ function easyrsa {
 	set -- "${args[@]}"
         /easy-rsa/easyrsa "$@"
 	if [ -d $_EASYRSA_PKI/issued ]; then
+		chmod u=rwx,go=x $_EASYRSA_PKI/issued
 		files=$(ls $_EASYRSA_PKI/issued/*.crt 2> /dev/null | wc -l)
 		[ "$files" != "0" ] && chmod u=rw,go=r $_EASYRSA_PKI/issued/*.crt
 	fi

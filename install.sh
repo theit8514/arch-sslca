@@ -14,10 +14,10 @@ if ! [ -f /easy-rsa/vars ]; then
 fi
 
 # remove unix socket from supervisord
-mv /etc/supervisor.conf /etc/supervisor.conf.prev1
-awk -F "=" -- '/\[unix_http_server\]/ { f=1; next }; /^\[/ { f=0; }; f==1 { next; }; { print; }' /etc/supervisor.conf.prev1 > /etc/supervisor.conf.prev2
-awk -F "=" -- '/\[supervisorctl\]/ { f=1; next }; /^\[/ { f=0; }; f==1 { next; }; { print; }' /etc/supervisor.conf.prev2 > /etc/supervisor.conf.prev3
-awk -F "=" -- '/\[supervisord]/ { f=1; print; next; }; f==1 && /^\[/ { print "[inet_http_server]\nport = 127.0.0.1:9001\n\n[supervisorctl]\nserverurl = http://localhost:9001\n"; f=0; }; { print; }' /etc/supervisor.conf.prev3 > /etc/supervisor.conf
-rm -f /etc/supervisor.conf.prev*
+mv /etc/supervisord.conf /etc/supervisord.conf.prev1
+awk -F "=" -- '/\[unix_http_server\]/ { f=1; next }; /^\[/ { f=0; }; f==1 { next; }; { print; }' /etc/supervisord.conf.prev1 > /etc/supervisord.conf.prev2
+awk -F "=" -- '/\[supervisorctl\]/ { f=1; next }; /^\[/ { f=0; }; f==1 { next; }; { print; }' /etc/supervisord.conf.prev2 > /etc/supervisord.conf.prev3
+awk -F "=" -- '/\[supervisord]/ { f=1; print; next; }; f==1 && /^\[/ { print "[inet_http_server]\nport = 127.0.0.1:9001\n\n[supervisorctl]\nserverurl = http://localhost:9001\n"; f=0; }; { print; }' /etc/supervisord.conf.prev3 > /etc/supervisord.conf
+rm -f /etc/supervisord.conf.prev*
 
 #https://github.com/OpenVPN/easy-rsa/releases/download/3.0.1/EasyRSA-3.0.1.tgz

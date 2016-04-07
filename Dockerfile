@@ -20,7 +20,7 @@ RUN chmod +x /root/deps.sh && \
 ENV PATH /easy-rsa:$PATH
 ENV HOME /root
 
-ADD supervisor/*.conf /etc/supervisor/conf.d/
+ADD supervisor/*.conf /etc/supervisor.d/
 ADD nginx/nginx.conf /etc/nginx/nginx.conf
 
 ADD install.sh /root/
@@ -52,4 +52,4 @@ WORKDIR /data
 ENTRYPOINT ["/root/start.sh"]
 
 # run supervisor
-CMD ["supervisord", "-c", "/etc/supervisor.conf", "-n"]
+CMD ["supervisord", "-c", "/etc/supervisord.conf", "-n"]
